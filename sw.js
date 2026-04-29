@@ -4,8 +4,6 @@
 // ============================================================
 
 // BASE otomatis terdeteksi dari letak sw.js
-// Jika sw.js ada di /Komite-Keperawatan-RSU-SHH/sw.js
-// maka BASE = '/Komite-Keperawatan-RSU-SHH/'
 const BASE = self.location.pathname.replace(/sw\.js$/, '');
 const CACHE_NAME = 'komkep-shh-v1';
 
@@ -47,8 +45,7 @@ self.addEventListener('fetch', event => {
   // Lewati non-GET
   if (event.request.method !== 'GET') return;
 
-  // KRITIS: hanya handle request di dalam scope BASE ini saja
-  // Request dari repo/app lain dibiarkan browser handle sendiri
+  // Hanya handle request di dalam scope BASE ini saja
   if (!url.pathname.startsWith(BASE)) return;
 
   // Network First → fallback Cache (untuk PWA offline)

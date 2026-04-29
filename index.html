@@ -190,7 +190,7 @@ td.mono{font-family:var(--mono);font-size:10px;color:#5a7a95}
 .detail-item-val{font-size:12px;font-weight:600;color:#1a2e45}
 
 /* ── DOC UPLOAD ── */
-.doc-upload-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px}
+.doc-upload-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
 .doc-upload-box{border:2px dashed #b8cde0;border-radius:10px;padding:12px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#f5f8fc}
 .doc-upload-box:hover,.doc-upload-box.has-file{border-color:var(--blue-l);background:rgba(37,99,235,.06)}
 .doc-upload-box.has-file{border-color:var(--green);background:rgba(5,150,105,.06)}
@@ -560,6 +560,14 @@ td.mono{font-family:var(--mono);font-size:10px;color:#5a7a95}
         <div class="doc-label">Bukti RKK</div>
         <div class="doc-sub">PDF / JPG / PNG</div>
         <div class="doc-status" id="docStatusRKK"></div>
+      </div>
+      <!-- UTW -->
+      <div class="doc-upload-box" id="docBoxUTW">
+        <input type="file" id="docInputUTW" accept=".pdf,image/*" onchange="previewDoc('UTW',event)">
+        <div class="doc-icon">📋</div>
+        <div class="doc-label">Bukti UTW</div>
+        <div class="doc-sub">PDF / JPG / PNG</div>
+        <div class="doc-status" id="docStatusUTW"></div>
       </div>
     </div>
 

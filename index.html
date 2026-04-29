@@ -211,6 +211,8 @@ td.mono{font-family:var(--mono);font-size:10px;color:#5a7a95}
 .doc-sip:hover{background:rgba(5,150,105,.22)}
 .doc-rkk{background:rgba(217,119,6,.12);border-color:rgba(251,191,36,.3);color:#fcd34d}
 .doc-rkk:hover{background:rgba(217,119,6,.22)}
+.doc-utw{background:rgba(139,92,246,.12);border-color:rgba(167,139,250,.3);color:#c4b5fd}
+.doc-utw:hover{background:rgba(139,92,246,.22)}
 .doc-none{background:var(--surface2);border-color:var(--border);color:var(--muted);cursor:not-allowed;opacity:.5}
 .center-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 20px;gap:12px;color:#7a9bb5;text-align:center}
 .spinner{width:34px;height:34px;border-radius:50%;border:3px solid #d1dce8;border-top-color:#1a5fa8;animation:spin .7s linear infinite}
@@ -520,6 +522,19 @@ td.mono{font-family:var(--mono);font-size:10px;color:#5a7a95}
     </div>
 
     <hr class="divider">
+    <div class="section-label">UTW — Uraian Tugas dan Wewenang</div>
+    <div class="form-grid">
+      <div class="fg">
+        <label>Tanggal Terbit UTW</label>
+        <input class="finput" id="fUtwTerbit" type="date">
+      </div>
+      <div class="fg">
+        <label>Tanggal Berakhir UTW</label>
+        <input class="finput" id="fUtwAkhir" type="date">
+      </div>
+    </div>
+
+    <hr class="divider">
     <div class="section-label">📎 Upload Dokumen (PDF / JPG)</div>
     <div class="doc-upload-row">
       <!-- STR -->
@@ -560,6 +575,7 @@ td.mono{font-family:var(--mono);font-size:10px;color:#5a7a95}
     <input type="hidden" id="fStrDoc" value="">
     <input type="hidden" id="fSipDoc" value="">
     <input type="hidden" id="fRkkDoc" value="">
+    <input type="hidden" id="fUtwDoc" value="">
 
   </div>
   <div class="modal-foot">
@@ -1063,6 +1079,8 @@ function openEdit(rowIndex) {
   document.getElementById('fSipAkhir').value = r.sipAkhir  || '';
   document.getElementById('fRkkTerbit').value= r.rkkTerbit || '';
   document.getElementById('fRkkAkhir').value = r.rkkAkhir  || '';
+  document.getElementById('fUtwTerbit').value= r.utwTerbit || '';
+  document.getElementById('fUtwAkhir').value = r.utwAkhir  || '';
   document.getElementById('fKet').value      = r.ket  || '';
   document.getElementById('fFoto').value     = r.foto || '';
   document.getElementById('fTglLahir').value     = r.tglLahir     || '';
@@ -1071,6 +1089,7 @@ function openEdit(rowIndex) {
   document.getElementById('fStrDoc').value   = r.strDoc || '';
   document.getElementById('fSipDoc').value   = r.sipDoc || '';
   document.getElementById('fRkkDoc').value   = r.rkkDoc || '';
+  document.getElementById('fUtwDoc').value   = r.utwDoc || '';
 
   if (r.foto) {
     const displayUrl = fixFotoUrl(r.foto);
@@ -1120,10 +1139,11 @@ async function submitForm() {
       fotoUrl = upRes.url;
     }
 
-    // 2. Upload dokumen STR/SIP/RKK jika ada file baru
+    // 2. Upload dokumen STR/SIP/RKK/UTW jika ada file baru
     let strDocUrl = document.getElementById('fStrDoc').value || '';
     let sipDocUrl = document.getElementById('fSipDoc').value || '';
     let rkkDocUrl = document.getElementById('fRkkDoc').value || '';
+    let utwDocUrl = document.getElementById('fUtwDoc').value || '';
 
     if (docFiles.STR) {
       showToast('📤 Mengupload dokumen STR…');
@@ -1140,6 +1160,11 @@ async function submitForm() {
       const r = await uploadFilePost('uploadRKK', docFiles.RKK.b64, docFiles.RKK.mime, docFiles.RKK.name, nama, 'RKK');
       rkkDocUrl = r.url;
     }
+    if (docFiles.UTW) {
+      showToast('📤 Mengupload dokumen UTW…');
+      const r = await uploadFilePost('uploadUTW', docFiles.UTW.b64, docFiles.UTW.mime, docFiles.UTW.name, nama, 'UTW');
+      utwDocUrl = r.url;
+    }
 
     const mode = document.getElementById('fMode').value;
     const data = {
@@ -1155,11 +1180,14 @@ async function submitForm() {
       sipAkhir:   document.getElementById('fSipAkhir').value,
       rkkTerbit:  document.getElementById('fRkkTerbit').value,
       rkkAkhir:   document.getElementById('fRkkAkhir').value,
+      utwTerbit:  document.getElementById('fUtwTerbit').value,
+      utwAkhir:   document.getElementById('fUtwAkhir').value,
       ket:        document.getElementById('fKet').value.trim(),
       foto:       fotoUrl,
       strDoc:     strDocUrl,
       sipDoc:     sipDocUrl,
       rkkDoc:     rkkDocUrl,
+      utwDoc:     utwDocUrl,
     };
 
     // ── ANTI DUPLIKAT ─────────────────────────────────────────
@@ -1220,7 +1248,7 @@ function toggleStrSeumurHidup() {
     inp.style.opacity = '1';
   }
 }
-let docFiles = { STR: null, SIP: null, RKK: null };
+let docFiles = { STR: null, SIP: null, RKK: null, UTW: null };
 
 // ── Preview dokumen yang dipilih ─────────────────────────────
 function previewDoc(type, e) {
@@ -1286,6 +1314,8 @@ function openDetail(rowIndex) {
       <div class="detail-item"><div class="detail-item-lbl">Berakhir SIP</div><div class="detail-item-val">${dateB(r.sipAkhir)}</div></div>
       <div class="detail-item"><div class="detail-item-lbl">Terbit RKK</div><div class="detail-item-val">${fmtDate(r.rkkTerbit)||'—'}</div></div>
       <div class="detail-item"><div class="detail-item-lbl">Berakhir RKK</div><div class="detail-item-val">${dateB(r.rkkAkhir)}</div></div>
+      <div class="detail-item"><div class="detail-item-lbl">Terbit UTW</div><div class="detail-item-val">${fmtDate(r.utwTerbit)||'—'}</div></div>
+      <div class="detail-item"><div class="detail-item-lbl">Berakhir UTW</div><div class="detail-item-val">${dateB(r.utwAkhir)}</div></div>
       ${r.ket ? `<div class="detail-item" style="grid-column:span 2"><div class="detail-item-lbl">Keterangan</div><div class="detail-item-val">${r.ket}</div></div>` : ''}
     </div>
 
@@ -1301,6 +1331,9 @@ function openDetail(rowIndex) {
         ${r.rkkDoc
           ? `<button onclick="openDoc('${r.rkkDoc.replace(/'/g,"\\'")}','RKK')" class="doc-view-btn doc-rkk">🏆 Lihat RKK</button>`
           : `<span class="doc-view-btn doc-none">🏆 RKK belum ada</span>`}
+        ${r.utwDoc
+          ? `<button onclick="openDoc('${r.utwDoc.replace(/'/g,"\\'")}','UTW')" class="doc-view-btn doc-utw">📋 Lihat UTW</button>`
+          : `<span class="doc-view-btn doc-none">📋 UTW belum ada</span>`}
       </div>
     </div>
   `;
@@ -1384,7 +1417,7 @@ function closeFormIfBg2(e) { if(e.target===document.getElementById('modalDetail'
 function closeFormIfBg3(e) { if(e.target===document.getElementById('modalConfirm')) closeModal('modalConfirm'); }
 
 function resetForm() {
-  ['fNama','fNip','fStrTerbit','fStrAkhir','fSipTerbit','fSipAkhir','fRkkTerbit','fRkkAkhir','fKet','fFoto','fRowIndex','fStrDoc','fSipDoc','fRkkDoc','fTglLahir','fTglBergabung'].forEach(id => {
+  ['fNama','fNip','fStrTerbit','fStrAkhir','fSipTerbit','fSipAkhir','fRkkTerbit','fRkkAkhir','fUtwTerbit','fUtwAkhir','fKet','fFoto','fRowIndex','fStrDoc','fSipDoc','fRkkDoc','fUtwDoc','fTglLahir','fTglBergabung'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('fUnit2').value   = '';
@@ -1497,7 +1530,7 @@ function exportExcel() {
     const headers = ['No','Nama','Unit','NIP','Status',
       'Tanggal Lahir','Tanggal Bergabung','Masa Kerja',
       'Terbit STR','Berakhir STR','Terbit SIP','Berakhir SIP',
-      'Terbit RKK','Berakhir RKK','Keterangan'];
+      'Terbit RKK','Berakhir RKK','Terbit UTW','Berakhir UTW','Keterangan'];
 
     const rows = filtered.map(r => [
       r.no, r.nama, r.unit, r.nip, r.status,
@@ -1507,6 +1540,7 @@ function exportExcel() {
       fmtDate(r.strTerbit), fmtDate(r.strAkhir),
       fmtDate(r.sipTerbit), fmtDate(r.sipAkhir),
       fmtDate(r.rkkTerbit), fmtDate(r.rkkAkhir),
+      fmtDate(r.utwTerbit), fmtDate(r.utwAkhir),
       r.ket || ''
     ]);
 

@@ -760,11 +760,16 @@ function updateStats() {
 // ═══════════════════════════════════════════════════════════
 //  FILTERS
 // ═══════════════════════════════════════════════════════════
+const MASTER_UNITS = ['QA','Manager Keperawatan','Komite Keperawatan','Ruang Intensif','Ruang IGD','Ruang VK','Ruang Bayi','Ruang OK','Ruang Lantai 3','Ruang Lantai 4','Ruang Gambuh A','Ruang Gambuh B','Ruang Gambuh C','Ruang HD','Ruang Poliklinik'];
+
 function populateUnitFilter() {
   const sel = document.getElementById('fUnit');
-  const units = [...new Set(allData.map(r => r.unit).filter(Boolean))].sort();
+  const cur = sel.value;
+  const dataUnits = allData.map(r => r.unit).filter(Boolean);
+  const units = [...new Set([...MASTER_UNITS, ...dataUnits])].sort();
   sel.innerHTML = '<option value="">Semua Unit</option>';
   units.forEach(u => sel.innerHTML += `<option value="${u}">${u}</option>`);
+  if (units.includes(cur)) sel.value = cur;
   populateYearFilter();
 }
 
